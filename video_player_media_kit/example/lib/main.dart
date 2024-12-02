@@ -23,6 +23,7 @@ void main() {
   // Use package:video_player normally!
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: _App(),
     ),
   );
@@ -42,10 +43,11 @@ class _App extends StatelessWidget {
               key: const ValueKey<String>('push_tab'),
               icon: const Icon(Icons.navigation),
               onPressed: () {
-                Navigator.push<_PlayerVideoAndPopPage>(
+                Navigator.push<_ButterFlyAssetVideo>(
                   context,
-                  MaterialPageRoute<_PlayerVideoAndPopPage>(
-                    builder: (BuildContext context) => _PlayerVideoAndPopPage(),
+                  MaterialPageRoute<_ButterFlyAssetVideo>(
+                    // builder: (BuildContext context) => _PlayerVideoAndPopPage(),
+                    builder: (BuildContext context) => _ButterFlyAssetVideo(),
                   ),
                 );
               },
@@ -182,26 +184,43 @@ class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.only(top: 20.0),
-          ),
-          const Text('With assets mp4'),
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
+    return Scaffold(
+      backgroundColor: Colors.black87,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
                 children: <Widget>[
-                  VideoPlayer(_controller),
-                  _ControlsOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
+                  Container(
+                    padding: const EdgeInsets.only(top: 20.0),
+                  ),
+                  const Text('With assets mp4'),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    child: AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: <Widget>[
+                          VideoPlayer(_controller),
+                          _ControlsOverlay(controller: _controller),
+                          VideoProgressIndicator(_controller,
+                              allowScrubbing: true),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
+          ),
+          MaterialButton(
+            color: Colors.red,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('ddffdf'),
           ),
         ],
       ),
@@ -406,6 +425,7 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
 
     _videoPlayerController =
         VideoPlayerController.asset('assets/Butterfly-209.mp4');
+
     _videoPlayerController.addListener(() {
       if (startedPlaying && !_videoPlayerController.value.isPlaying) {
         Navigator.pop(context);
@@ -436,7 +456,16 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
             if (snapshot.data ?? false) {
               return AspectRatio(
                 aspectRatio: _videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(_videoPlayerController),
+                child: Stack(
+                  children: [
+                    VideoPlayer(_videoPlayerController),
+                    Container(
+                        color: Colors.red,
+                        child: _ControlsOverlay(
+                            controller: _videoPlayerController)),
+                    // VideoProgressIndicator(_videoPlayerController, allowScrubbing: true),
+                  ],
+                ),
               );
             } else {
               return const Text('waiting for video to load');
